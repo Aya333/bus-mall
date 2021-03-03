@@ -1,0 +1,17 @@
+#images{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+ }
+ #leftImage {
+    width :400px ;
+    height: 375px;
+}
+#centereImage{
+    width : 400px ;
+    height: 375px;
+}
+#rightImage{
+    width : 400px;
+    height: 375px;
+}
