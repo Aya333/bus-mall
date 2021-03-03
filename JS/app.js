@@ -227,3 +227,12 @@ document.getElementById('result').addEventListener('click', function () {
 
 });
 
+function getData() {
+  const updateData = localStorage.getItem('product');
+  if(updateData) {
+    const objData = JSON.parse(updateData);
+    Obj.all = objData;
+    render();
+  }
+}
+getData();
