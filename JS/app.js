@@ -228,7 +228,7 @@ document.getElementById('result').addEventListener('click', function () {
 });
 
 function getData() {
-  const updateData = localStorage.getItem('product');
+  const updateData = localStorage.getItem('Obj');
   if(updateData) {
     const objData = JSON.parse(updateData);
     Obj.all = objData;
