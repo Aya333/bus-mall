@@ -3,15 +3,15 @@
     grid-template-columns: 1fr 1fr 1fr;
     gap: 20px;
  }
- #leftImage {
-    width :400px ;
+ #firstImage {
+    width :375px ;
     height: 375px;
 }
-#centereImage{
-    width : 400px ;
+#secondImage{
+    width : 375px ;
     height: 375px;
 }
-#rightImage{
-    width : 400px;
+#thirdImage{
+    width : 375px;
     height: 375px;
 }
