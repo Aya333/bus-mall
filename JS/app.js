@@ -1,248 +1,258 @@
-/* eslint-disable no-undef */
 
 'use strict';
-let ImgArray = ['bag.jpg', 'banana.jpg', 'bathroom.jpg', 'boots.jpg', 'breakfast.jpg', 'bubblegum.jpg',
-  'chair.jpg', 'cthulhu.jpg', 'dog-duck.jpg', 'dragon.jpg', 'pen.jpg', 'pet-sweep.jpg', 'scissors.jpg',
-  'shark.jpg', 'sweep.png', 'tauntaun.jpg', 'unicorn.jpg', 'usb.gif', 'water-can.jpg', 'wine-glass.jpg'];
+let previousImages = [1, 2, 3];
+let currentImages = [4, 5, 6];
+let allImages = [];
+let imageDOM = [
+  document.getElementById('left-image'),
+  document.getElementById('center-image'),
+  document.getElementById('right-image')
+];
+let reset = document.getElementById('reset-button');
 
-let count = 25;
-let firstImageIndex = 0;
-let secondImageIndex = 0;
-let thirdImageIndex = 0;
-const images = document.getElementById('images');
-const firstImage = document.getElementById('firstImage');
-const secondImage = document.getElementById('secondImage');
-const thirdImage = document.getElementById('thirdImage');
-document.getElementById('result');
+let countdown = 25;
+let objectNames = [];
+let objectShowings = [];
+let objectClickings = [];
 
-
-
-function Obj(name) {
-  this.name = name;
-  if (name ==='usb'){
-    this.img = `./img/${name}.gif`;}
-  else if (name === 'sweep'){
-    this.img = `./img/${name}.png`;
-  }else {
-    this.img = `./img/${name}.jpg`;
-  }
-  this.NumberOfClicks = 0;
-  this.show= 0;
-  Obj.all.push(this);
-}
-Obj.all = [];
-Obj.counter = 0;
+let header = document.getElementById('table-header');
+let body = document.getElementById('table-body');
 
 
-for (let i = 0; i < ImgArray.length; i++) {
-  new Obj(ImgArray[i]);
-}
-let newArr = [];
+let Images = function (imageName, fileFormat) {
+  this.name = imageName;
+  this.filePath = './img/' + imageName + '.' + fileFormat;
+  this.valid = true;
+  this.timesShown = 0;
+  this.timesClicked = 0;
+};
+
+allImages.push(
+  new Images('bag', 'jpg'),
+  new Images('banana', 'jpg'),
+  new Images('bathroom', 'jpg'),
+  new Images('boots', 'jpg'),
+  new Images('breakfast', 'jpg'),
+  new Images('bubblegum', 'jpg'),
+  new Images('chair', 'jpg'),
+  new Images('cthulhu', 'jpg'),
+  new Images('dog-duck', 'jpg'),
+  new Images('dragon', 'jpg'),
+  new Images('pen', 'jpg'),
+  new Images('pet-sweep', 'jpg'),
+  new Images('scissors', 'jpg'),
+  new Images('shark', 'jpg'),
+  new Images('sweep', 'png'),
+  new Images('tauntaun', 'jpg'),
+  new Images('unicorn', 'jpg'),
+  new Images('usb', 'gif'),
+  new Images('water-can', 'jpg'),
+  new Images('wine-glass', 'jpg')
+
+);
+
+Images.prototype.convertToImgTag = function () {
+  return '<img id="' + this.name + '" src="' + this.filePath + '" >';
+};
 
 
-
-function render() {
-  newArr=[];
-  if (Obj.counter >0){
-    newArr= [firstImageIndex,secondImageIndex,thirdImageIndex];
-  }
-
-  let firstIndex;
-  let secondIndex;
-  let thirdIndex;
-
-  firstIndex = randomNumber(0, Obj.all.length - 1);
-  firstImage.src = Obj.all[firstIndex].img;
-  firstImage.alt = Obj.all[firstIndex].name;
-  firstImageIndex = firstIndex;
-  newArr.push(firstIndex);
+let randomIndex = function () {
+  return Math.floor(Math.random() * allImages.length);
+};
 
 
-
-  do {
-    secondIndex = randomNumber(0, Obj.all.length - 1);
-  } while (firstIndex === secondIndex || secondIndex === thirdIndex);
-
-  secondImage.src = Obj.all[secondIndex].img;
-  secondImage.alt = Obj.all[secondIndex].name;
-  secondImageIndex = secondIndex;
-  newArr.push(secondIndex);
-
-
-
-  do {
-    thirdIndex = randomNumber(0, Obj.all.length - 1);
-  } while (firstIndex === thirdIndex || thirdIndex === secondIndex);
-  thirdImage.src = Obj.all[thirdIndex].img;
-  thirdImage.alt = Obj.all[thirdIndex].name;
-  thirdImageIndex = thirdIndex;
-  newArr.push(thirdIndex);
-
-
-  Obj.all[firstIndex].show++;
-  Obj.all[secondIndex].show++;
-  Obj.all[thirdIndex].show++;
-}
-
-function handleClick (event){
-  if (Obj.counter < count){
-    const clickedElement = event.target;
-    if (clickedElement.id === 'firstImage' || clickedElement.id === 'secondImage' || clickedElement.id === 'thirdImage'){
-
-      if (clickedElement.id === 'firstImage'){
-        Obj.all[firstImageIndex].NumberOfClicks++;
-
-      }
-      if (clickedElement.id === 'secondImage'){
-        Obj.all[secondImageIndex].NumberOfClicks++;
-      }
-      if (clickedElement.id === 'thirdImage'){
-        Obj.all[thirdImageIndex].NumberOfClicks++;
-      }
+let updateImages = function () {
+  for (let j = 0; j < imageDOM.length; j++){
+    imageAtIndex(previousImages[j]).valid = true;
+    previousImages[j] = currentImages[j];
+    while (imageAtIndex(currentImages[j]).valid === false) {
+      currentImages[j] = randomIndex();
     }
-
-    Obj.counter++;
-
-    render();
+    imageAtIndex(currentImages[j]).valid = false;
   }
-  if (Obj.counter === count){
-    document.getElementById('result').style.visibility = 'visible';
-    images.removeEventListener ('click', handleClick);
+};
+
+
+let imageAtIndex = function (index) {
+  return allImages[index];
+};
+
+let updatePage = function () {
+  for (let k = 0; k < imageDOM.length; k++) {
+    imageDOM[k].innerHTML = '';
+    imageDOM[k].innerHTML = imageAtIndex(currentImages[k]).convertToImgTag();
   }
-}
+};
 
-images.addEventListener('click',handleClick);
 
-function randomNumber( min, max ) {
-  let indexNumber = Math.floor( Math.random() * ( max - min + 1 ) ) + min;
-
-  for (let index = 0 ; index < newArr.length ; index++){
-
-    if (indexNumber === newArr[index]){
-      indexNumber = Math.floor( Math.random() * ( max - min + 1 ) ) + min;
-
-    }
+let updateShown = function () {
+  for (let l = 0; l < 3; l++) {
+    imageAtIndex(currentImages[l]).timesShown++;
+    imageAtIndex(currentImages[l]).valid = false;
   }
-  return (indexNumber);
-}
+};
 
 
-let buttonClick = 0 ;
-let clickArr = [];
-let viewArr = [];
-localStorage;
-render();
 
-document.getElementById('result').addEventListener('click', function() {
-  localStorage.setItem ('Obj',JSON.stringify(Obj.all));
-  console.log (localStorage);
-  buttonClick = buttonClick +1;
-  const container = document.getElementById ('Results');
-  const ulElement =document.createElement ('ul');
-  container.appendChild (ulElement);
-
-  for (let index = 0 ; index < ImgArray.length ; index++){
-    const liElement = document.createElement ('li');
-
-    ulElement.appendChild (liElement);
-    liElement.textContent = (`${ImgArray[index]} had ${Obj.all[index].NumberOfClicks } votes, and was seen ${Obj.all[index].show} times.`);
-    clickArr.push (Obj.all[index].NumberOfClicks);
-    viewArr.push (Obj.all[index].show);
+let clearImages = function () {
+  imageDOM[0].removeEventListener('click', oneClicked);
+  imageDOM[1].removeEventListener('click', twoClicked);
+  imageDOM[2].removeEventListener('click', threeClicked);
+  for (let m = 0; m < imageDOM.length; m++) {
+    imageDOM[m].style.visibility = 'hidden';
   }
+};
+let putDataInArrays = function () {
+  for (let p = 0; p < allImages.length; p++){
+    objectNames.push(allImages[p].name);
+    objectShowings.push(allImages[p].timesShown);
+    objectClickings.push(allImages[p].timesClicked);
+  }
+};
 
-  let ctx = document.getElementById('chart').getContext('2d');
+
+let makeCell = function (input, parent, type) {
+  let cell = document.createElement(type);
+  cell.innerHTML = input;
+  parent.appendChild(cell);
+};
+
+
+let makeTable = function () {
+
+  let headerRow = document.createElement('tr');
+  makeCell('Images', header, 'th');
+  makeCell('Times Seen', header, 'th');
+  makeCell('Times Clicked', header, 'th');
+  header.appendChild(headerRow);
+
+
+  for (let o = 0; o < allImages.length; o++) {
+    let tableRow = document.createElement('tr');
+    makeCell(allImages[o].name, body, 'th');
+    makeCell(allImages[o].timesShown, body, 'td');
+    makeCell(allImages[o].timesClicked, body, 'td');
+    body.appendChild(tableRow);
+  }
+};
+let refresh = function () {
+  updateShown();
+  updateImages();
+  updatePage();
+};
+
+let saveProgress = function () {
+  localStorage.savedCountdown = countdown;
+  for (let saveSlot = 0; saveSlot < allImages.length; saveSlot++) {
+    localStorage['name for image #' + saveSlot] = imageAtIndex(saveSlot).name;
+    localStorage['image showings for image #' + saveSlot] = imageAtIndex(saveSlot).timesShown;
+    localStorage['image clickings for image #' + saveSlot] = imageAtIndex(saveSlot).timesClicked;
+  }
+};
+let loadProgress = function () {
+  countdown = parseInt(localStorage.savedCountdown);
+  for (let loadSlot = 0; loadSlot < allImages.length; loadSlot++) {
+    imageAtIndex(loadSlot).name = localStorage['name for image #' + loadSlot];
+    imageAtIndex(loadSlot).timesShown = parseInt(localStorage['image showings for image #' + loadSlot]);
+    imageAtIndex(loadSlot).timesClicked = parseInt(localStorage['image clickings for image #' + loadSlot]);
+  }
+};
+
+
+
+let makeChart = function () {
+  let ctx = document.getElementById('dataChart').getContext('2d');
+  ctx.canvas.width = '1000';
+  ctx.canvas.height = '250';
   new Chart(ctx, {
     type: 'bar',
-    data: {
-      labels: ImgArray,
-      datasets: [{
-        label: 'Number of Votes',
-        data: clickArr,
-        backgroundColor: [
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)'
-        ],
-        borderColor: [
-          'rgba(75, 192, 192, 1)',
-        ],
-        borderWidth: 1
-      }
-      ,{
-        label: 'Times Seen',
-        data: viewArr,
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
 
-        ],
-        borderColor: [
-          'rgba(255, 99, 132, 1)',
-        ],
-        borderWidth: 1
+    data: {
+      labels: objectNames,
+      datasets: [{
+        label: 'Times Seen',
+        borderWidth: 1,
+        backgroundColor: 'rgb(212, 213, 213)',
+        borderColor : 'rgb(0, 55, 95)',
+        data: objectShowings,
+      },
+      {
+        label: 'Times Clicked',
+        borderWidth: 1,
+        backgroundColor: 'rgb(0, 55, 95)',
+        borderColor:  'rgb(212, 213, 213)',
+        data: objectClickings,
       }]
-    },
-    options: {
-      scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero: true
-          }
-        }]
-      }
     }
   });
+  localStorage.firstTime = false;
+};
+let startUp = function () {
+  refresh();
+  if (localStorage.savedCountdown) {
+    loadProgress();}
+};
+
+startUp();
+
+imageDOM[0].addEventListener('click', oneClicked);
+imageDOM[1].addEventListener('click', twoClicked);
+imageDOM[2].addEventListener('click', threeClicked);
+reset.addEventListener('click', resetClick);
 
 
-  if (buttonClick >= 1){
-    document.getElementById('result').style.visibility = 'hidden';
-  }
 
-});
-function getData() {
-  const updateData = localStorage.getItem('Obj');
-  if(updateData) {
-    const objData = JSON.parse(updateData);
-    Obj.all = objData;
-    render();
+function oneClicked () {
+  if (countdown > 0) {
+    imageAtIndex(currentImages[0]).timesClicked++;
+    refresh();
+    saveProgress();
+    countdown--;
+  } else {
+    clearImages();
+    putDataInArrays();
+    makeTable();
+    makeChart();
+
   }
 }
-getData();
 
 
 
+function twoClicked () {
+  if (countdown > 0) {
+    imageAtIndex(currentImages[1]).timesClicked++;
+    refresh();
+    saveProgress();
+    countdown--;
+  } else {
+    clearImages();
+    putDataInArrays();
+    makeTable();
+    makeChart();
+  }
+}
+
+
+
+function threeClicked () {
+  if (countdown > 0) {
+    imageAtIndex(currentImages[2]).timesClicked++;
+    refresh();
+    saveProgress();
+    countdown--;
+  } else {
+    clearImages();
+    putDataInArrays();
+    makeTable();
+    makeChart();
+  }
+}
+function resetClick () {
+  startUp();
+  countdown = 25;
+  localStorage.savedCountdown = countdown;
+  imageDOM[0].addEventListener('click', oneClicked);
+  imageDOM[1].addEventListener('click', twoClicked);
+  imageDOM[2].addEventListener('click', threeClicked);
+}
